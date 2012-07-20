@@ -424,8 +424,6 @@ NSString *kCurrentItemKey	= @"currentItem";
         }
     }
     NSLog(@"End of items from a AnyAudio query...");
-    [allMusicModelArray addObject:[NSURL URLWithString:@"http://zhangmenshiting2.baidu.com/data2/music/339060/339060.mp3"]];
-    /*I added a web song of Elva's(萧亚轩) 同步呼吸(Breath Together) in case your iOS device do not have Any Audio. This song has it's copy right so do not use in other ways. :)*/
     self.allMusicArray = allMusicModelArray;
     [allMusicModelArray release];
     [allMusicQuery release];
