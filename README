@@ -1,0 +1,7 @@
+Modified from Apple's Sample Code StitchedStreamPlayer, and fix some bugs of it.
+    In Apple's Code when you change it to play more then one AVPlayerItem it will crash.
+    The Origin code of Apple's sample first addObservers and then make replaceCurrentItemWithPlayerItem, 
+this resulting a crash when a notification for the previous item calls after that item is released. 
+I changed the order to first make replaceCurrentItemWithPlayerItem and then addObservers and fix the crash bug.
+    And I turned this sample code into a pure music player, which can do play, pause, next and previous audio work, together with background audio playing with remote controlling as well!
+    Fix some memory bugs of StitchedStreamPlayer when receiving level 2 memory warning.
