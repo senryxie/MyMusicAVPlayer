@@ -385,11 +385,6 @@ NSString *kCurrentItemKey	= @"currentItem";
     [self removeAllMyObservers];
     
     currentSong = -1;
-    self.toolBar = nil;
-    self.playButton = nil;
-    self.stopButton = nil;
-    self.nextButton = nil;
-    self.preButton = nil;
     self.musicTimeControl = nil;
     self.allMusicArray = nil;
     self.playerItem = nil;
