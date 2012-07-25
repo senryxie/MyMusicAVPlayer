@@ -363,6 +363,10 @@ NSString *kCurrentItemKey	= @"currentItem";
 
 - (void)dealloc
 {
+    if ([self isPlaying])
+    {
+        [self.player pause];
+    }
     [self removePlayerTimeObserver];
     [self removeAllMyObservers];
     
