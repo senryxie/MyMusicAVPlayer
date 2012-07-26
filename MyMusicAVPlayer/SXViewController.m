@@ -422,6 +422,9 @@ NSString *kCurrentItemKey	= @"currentItem";
             NSLog(@"songUrl:%@",songUrl);
         }
     }
+    //These Web music may have copy rights, please DO NOT use them in other ways.
+    [allMusicModelArray addObject:[NSURL URLWithString:@"http://wdl.oppo.com/d/files/audio/2009/12/09/092244_4160615.MP3"]];
+    [allMusicModelArray addObject:[NSURL URLWithString:@"http://bbs.zj60.com/uploadfile/200551614395641718.mp3?song=&wxc"]];
     NSLog(@"End of items from a AnyAudio query...");
     self.allMusicArray = allMusicModelArray;
     [allMusicModelArray release];
@@ -590,6 +593,21 @@ NSString *kCurrentItemKey	= @"currentItem";
  */
 - (void)prepareToPlayAsset:(AVURLAsset *)asset withKeys:(NSArray *)requestedKeys
 {
+    /* At this point we're ready to set up for playback of the asset. */
+    [self removePlayerTimeObserver];
+    
+    /* Stop observing our prior AVPlayerItem, if we have one. */
+    if (self.playerItem)
+    {
+        NSLog(@"Remove existing player item key value observers");
+        /* Remove existing player item key value observers and notifications. */
+        [self.playerItem removeObserver:self forKeyPath:kStatusKey];            
+		
+        [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                        name:AVPlayerItemDidPlayToEndTimeNotification
+                                                      object:self.playerItem];
+    }
+    
     NSLog(@"prepareToPlayAsset");
     /* Make sure that the value of each key has loaded successfully. */
 	for (NSString *thisKey in requestedKeys)
@@ -598,6 +616,11 @@ NSString *kCurrentItemKey	= @"currentItem";
 		AVKeyValueStatus keyStatus = [asset statusOfValueForKey:thisKey error:&error];
 		if (keyStatus == AVKeyValueStatusFailed)
 		{
+            if ([self isPlaying])
+            {
+                [self.player pause];
+            }
+            self.playerItem = nil;
 			[self assetFailedToPrepareForPlayback:error];
             /*And skip to next song*/
             [self next:nil];
@@ -618,29 +641,15 @@ NSString *kCurrentItemKey	= @"currentItem";
 								   localizedFailureReason, NSLocalizedFailureReasonErrorKey, 
 								   nil];
 		NSError *assetCannotBePlayedError = [NSError errorWithDomain:@"StitchedStreamPlayer" code:0 userInfo:errorDict];
-        
+        if ([self isPlaying])
+        {
+            [self.player pause];
+        }
+        self.playerItem = nil;
         /* Display the error to the user. And skip to next song*/
         [self assetFailedToPrepareForPlayback:assetCannotBePlayedError];
         [self next:nil];
         return;
-    }
-	
-	/* At this point we're ready to set up for playback of the asset. */
-    [self removePlayerTimeObserver];
-	[self initScrubberTimer];
-	[self enableScrubber];
-	[self enablePlayerButtons];
-	
-    /* Stop observing our prior AVPlayerItem, if we have one. */
-    if (self.playerItem)
-    {
-        NSLog(@"Remove existing player item key value observers");
-        /* Remove existing player item key value observers and notifications. */
-        [self.playerItem removeObserver:self forKeyPath:kStatusKey];            
-		
-        [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                        name:AVPlayerItemDidPlayToEndTimeNotification
-                                                      object:self.playerItem];
     }
 	
     /* Create a new instance of AVPlayerItem from the now successfully loaded AVAsset. */
@@ -695,7 +704,9 @@ NSString *kCurrentItemKey	= @"currentItem";
         [[self player] replaceCurrentItemWithPlayerItem:self.playerItem];
         [self syncPlayPauseButtons];
     }
-	
+	[self initScrubberTimer];
+	[self enableScrubber];
+	[self enablePlayerButtons];
     /*
     The Origin code of Apple's sample first addObservers and then make replaceCurrentItemWithPlayerItem,
     this resulting a crash when a notification for the previous item calls after that item is released.
