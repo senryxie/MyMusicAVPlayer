@@ -692,11 +692,6 @@ NSString *kCurrentItemKey	= @"currentItem";
                          context:MyStreamingMovieViewControllerRateObservationContext];
     }
     
-    /* At this point we're ready to set up for playback of the asset. */
-	[self initScrubberTimer];
-	[self enableScrubber];
-	[self enablePlayerButtons];
-    
     /* Make our new AVPlayerItem the AVPlayer's current item. */
     if (self.player.currentItem != self.playerItem)
     {
