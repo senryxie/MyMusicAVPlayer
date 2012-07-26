@@ -593,7 +593,6 @@ NSString *kCurrentItemKey	= @"currentItem";
  */
 - (void)prepareToPlayAsset:(AVURLAsset *)asset withKeys:(NSArray *)requestedKeys
 {
-    /* At this point we're ready to set up for playback of the asset. */
     [self removePlayerTimeObserver];
     
     /* Stop observing our prior AVPlayerItem, if we have one. */
@@ -693,6 +692,11 @@ NSString *kCurrentItemKey	= @"currentItem";
                          context:MyStreamingMovieViewControllerRateObservationContext];
     }
     
+    /* At this point we're ready to set up for playback of the asset. */
+	[self initScrubberTimer];
+	[self enableScrubber];
+	[self enablePlayerButtons];
+    
     /* Make our new AVPlayerItem the AVPlayer's current item. */
     if (self.player.currentItem != self.playerItem)
     {
@@ -704,9 +708,7 @@ NSString *kCurrentItemKey	= @"currentItem";
         [[self player] replaceCurrentItemWithPlayerItem:self.playerItem];
         [self syncPlayPauseButtons];
     }
-	[self initScrubberTimer];
-	[self enableScrubber];
-	[self enablePlayerButtons];
+    
     /*
     The Origin code of Apple's sample first addObservers and then make replaceCurrentItemWithPlayerItem,
     this resulting a crash when a notification for the previous item calls after that item is released.
